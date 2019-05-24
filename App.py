@@ -4,21 +4,10 @@ from flask_cors import CORS
 import os
 
 app = Flask(__name__)
-
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
-
 CORS(app)
 db = SQLAlchemy(app)
-
-
-class ProfileImage(db.Model):
-    __tablename__ = "profileImages"
-    id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String(), nullable=False)
-
-    def __init__(self, url):
-        self.url = url
 
 
 class Bio(db.Model):
@@ -29,16 +18,6 @@ class Bio(db.Model):
     def __init__(self, description):
         self.description = description
 
-
-class Like(db.Model):
-    __tablename__ = "likes"
-    id = db.Column(db.Integer, primary_key=True)
-    amount = db.Column(db.Integer(), nullable=False, unique=False)
-
-    def __init__(self, amount):
-        self.amount = amount
-
-
 class GameTitles(db.Model):
     __tablename__ = "gametitles"
     id = db.Column(db.Integer, primary_key=True)
@@ -46,7 +25,6 @@ class GameTitles(db.Model):
 
     def __init__(self, title):
         self.title = title
-
 
 class GameCategory(db.Model):
     __tablename__ = "gamecategory"
@@ -57,33 +35,54 @@ class GameCategory(db.Model):
         self.category = category
 
 
-@app.route('/post', methods=["POST"])
-def image_post():
+@app.route('/create-bio', methods=["POST"])
+def bio_create():
     if request.content_type == "application/json":
         post_data = request.get_json()
-        title = post_data.get('title')
         description = post_data.get('description')
-        url = post_data.get('url')
-        adding = Images(title, description, url)
+        adding = Bio(description)
         db.session.add(adding)
         db.session.commit()
         return jsonify("success")
     return jsonify("error")
+@app.route("/bio/<id>", methods=["GET"])
+def get_bio(id):
+    all_bio = db.session.query(Bio.id, Bio.description).all()
+    return jsonify(all_bio)
 
-@app.route("/userfeed/<id>", methods=["GET"])
-def get_images(id):
-    all_images = db.session.query(Images.id, Images.title, Images.url, Images.description).all()
-    return jsonify(all_images)
-    
 
-    # image_post = Guide(title, description, url)
+@app.route('/create-gametitle', methods=["POST"])
+def gametitle_create():
+    if request.content_type == "application/json":
+        post_data = request.get_json()
+        title = post_data.get('title')
+        adding = GameTitles(title)
+        db.session.add(adding)
+        db.session.commit()
+        return jsonify("success")
+    return jsonify("error")
+@app.route("/game-title/<id>", methods=["GET"])
+def get_gametitle(id):
+    all_gametitle = db.session.query(GameTitles.id, GameTitles.title).all()
+    return jsonify(all_gametitle)
 
-    # db.session.add(image_post)
-    # db.session.commit()
 
-    # guide = Guide.query.get(image_post.id)
+@app.route('/create-gamecategory', methods=["POST"])
+def gamecategory_create():
+    if request.content_type == "application/json":
+        post_data = request.get_json()
+        category = post_data.get('category')
+        adding = GameCategory(category)
+        db.session.add(adding)
+        db.session.commit()
+        return jsonify("success")
+    return jsonify("error")
+@app.route("/gamecategory/<id>", methods=["GET"])
+def get_gamecategory(id):
+    all_gamecategory = db.session.query(GameCategory.id, GameCategory.category).all()
+    return jsonify(all_gamecategory)
 
-    # return guide_schema.jsonify(guide)
+
 
 
 
