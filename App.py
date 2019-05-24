@@ -78,13 +78,31 @@ class GameCategory(db.Model):
     def __init__(self, category):
         self.category = category
 
-# Post image
-# Save image
-# View album
-# Profile Edit
-# Delete image
-# Delete profile
-# Admin page with privaleges
+
+@app.route('/post', methods=["POST"])
+def image_post():
+    if request.content_type == "aplication/json":
+        post_data = request.get_json()
+        title = request.json('title')
+        description = request.json('description')
+        url = request.json('url')
+        adding = Images(title, description, url)
+        db.session.add(adding)
+        db.session.commit()
+
+        return jsonify("success")
+    
+    return jsonify("error")
+    
+
+    # image_post = Guide(title, description, url)
+
+    # db.session.add(image_post)
+    # db.session.commit()
+
+    # guide = Guide.query.get(image_post.id)
+
+    # return guide_schema.jsonify(guide)
 
 
 
