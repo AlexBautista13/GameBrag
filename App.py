@@ -12,19 +12,6 @@ CORS(app)
 db = SQLAlchemy(app)
 
 
-class Images(db.Model):
-    __tablename__ = "images"
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(20), nullable=False, unique=True)
-    url = db.Column(db.String(), nullable=False)
-    description = db.Column(db.String(50))
-
-    def __init__(self, url, description, title):
-        self.title = title
-        self.url = url
-        self.description = description
-
-
 class ProfileImage(db.Model):
     __tablename__ = "profileImages"
     id = db.Column(db.Integer, primary_key=True)
@@ -43,19 +30,10 @@ class Bio(db.Model):
         self.description = description
 
 
-class UserName(db.Model):
-    __tablename__ = "usernames"
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), nullable=False, unique=True)
-
-    def __init__(self, username):
-        self.username = username
-
-
 class Like(db.Model):
     __tablename__ = "likes"
     id = db.Column(db.Integer, primary_key=True)
-    amount = db.Column(db.int(), nullable=False, unique=False)
+    amount = db.Column(db.Integer(), nullable=False, unique=False)
 
     def __init__(self, amount):
         self.amount = amount
@@ -64,7 +42,7 @@ class Like(db.Model):
 class GameTitles(db.Model):
     __tablename__ = "gametitles"
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.string(20), nullable=False, unique=True)
+    title = db.Column(db.String(20), nullable=False, unique=True)
 
     def __init__(self, title):
         self.title = title
@@ -73,7 +51,7 @@ class GameTitles(db.Model):
 class GameCategory(db.Model):
     __tablename__ = "gamecategory"
     id = db.Column(db.Integer, primary_key=True)
-    category = db.Column(db.string(20), nullable=False, unique=True)
+    category = db.Column(db.String(20), nullable=False, unique=True)
 
     def __init__(self, category):
         self.category = category
@@ -81,18 +59,21 @@ class GameCategory(db.Model):
 
 @app.route('/post', methods=["POST"])
 def image_post():
-    if request.content_type == "aplication/json":
+    if request.content_type == "application/json":
         post_data = request.get_json()
-        title = request.json('title')
-        description = request.json('description')
-        url = request.json('url')
+        title = post_data.get('title')
+        description = post_data.get('description')
+        url = post_data.get('url')
         adding = Images(title, description, url)
         db.session.add(adding)
         db.session.commit()
-
         return jsonify("success")
-    
     return jsonify("error")
+
+@app.route("/userfeed/<id>", methods=["GET"])
+def get_images(id):
+    all_images = db.session.query(Images.id, Images.title, Images.url, Images.description).all()
+    return jsonify(all_images)
     
 
     # image_post = Guide(title, description, url)
