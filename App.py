@@ -4,6 +4,7 @@ from flask_cors import CORS
 import os
 
 app = Flask(__name__)
+heroku = Heroku(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
 CORS(app)
@@ -61,7 +62,7 @@ def gametitle_create():
         db.session.commit()
         return jsonify("success")
     return jsonify("error")
-@app.route("/game-title/<id>", methods=["GET"])
+@app.route("/gametitle/<id>", methods=["GET"])
 def get_gametitle(id):
     all_gametitle = db.session.query(GameTitles.id, GameTitles.title).all()
     return jsonify(all_gametitle)

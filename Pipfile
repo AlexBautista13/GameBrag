@@ -9,6 +9,8 @@ verify_ssl = true
 flask = "*"
 flask-sqlalchemy = "*"
 flask-cors = "*"
+heroku = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"
